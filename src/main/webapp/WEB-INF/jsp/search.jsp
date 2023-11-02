@@ -38,6 +38,7 @@
     - <c:out value="${query.q}" escapeXml="true"/>
   </c:if>
 </title>
+<link rel="stylesheet" href="/js/jquery-ui-1.13.2.custom/jquery-ui.min.css">
 <jsp:include page="/WEB-INF/jsp/header.jsp"/>
 
 <H1>Поиск по сайту</h1>
@@ -47,6 +48,13 @@
 <form:input class="input-lg" path="q" type="search" size="50" maxlength="250" autofocus="autofocus"/>&nbsp;
 <button type="submit" class="btn btn-primary">Поиск</button><BR>
 </div>
+
+<div class="control-group">
+<label>на дату</label>
+<form:input id="selectedDt" path="dt" type="hidden" />
+<input id="selectDt" class="input" type="text" />
+</div>
+
 
 <div class="control-group">
 <form:select path="range" items="${ranges}"/>
@@ -156,5 +164,36 @@
   </p>
 </c:if>
 </form:form>
+
+<script type="text/javascript">
+    $script.ready("jquery", function() {
+        $script("/js/jquery-ui-1.13.2/jquery-ui.min.js", "jqueryui");
+    });
+
+    $script.ready(["jquery","jqueryui"], function() {
+        $("#selectDt").datepicker({
+            dateFormat: "dd.mm.yy",
+            onSelect: function(dateText) {
+                console.log("selected: ",dateText);
+                d = moment(dateText,'DD.MM.YYYY')
+                dd =d.toDate();
+                ddd= dd.getTime();
+                console.log("d: ",d,"dd:",dd,"ddd:",ddd);
+
+                document.getElementById('selectedDt').value=ddd;
+            }
+        });
+
+        var selectedDate = document.getElementById('selectedDt').value;
+
+        if (selectedDate) {
+            d  = moment(selectedDate,'x').format('DD.MM.YYYY');
+            console.log("selected: ",selectedDate,"d:",d);
+            $("#selectDt").datepicker("setDate", d );
+        }
+
+    });
+
+</script>
 
 <jsp:include page="/WEB-INF/jsp/footer.jsp"/>

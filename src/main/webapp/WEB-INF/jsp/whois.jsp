@@ -79,8 +79,16 @@
                         subDomainTitleFormat: {
                             empty: "{date}",
                             filled: "{date}<br>сообщений: {count}"
+                        },
+                        onClick: function (date, nb) {
+                            var d = date.getTime();
+                            console.log("clicked: ",date,"d:",d);
+
+                             window.open('../search.jsp?dt='+d, '_blank');
+                             //.focus();
                         }
                     });
+
                 }
             });
         });

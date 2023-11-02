@@ -21,9 +21,16 @@ import ru.org.linux.user.User;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 public class SearchRequest {
   private String q = "";
@@ -35,6 +42,10 @@ public class SearchRequest {
   private SearchInterval interval = SearchInterval.ALL;
   private SearchRange range = SearchRange.ALL;
   private int offset = 0;
+  private long dt;
+
+  public long getDt() { return dt;   }
+  public void setDt(long dt) { this.dt = dt; }
 
   public String getQ() {
     return q;
@@ -45,7 +56,7 @@ public class SearchRequest {
   }
 
   public boolean isInitial() {
-    return q.isEmpty() && user==null;
+    return q.isEmpty() && user==null && !isDateSelected();
   }
 
   public boolean isUsertopic() {
@@ -159,7 +170,7 @@ public class SearchRequest {
     StringBuilder str = new StringBuilder();
 
     for (Entry<String, String> entry : params.entrySet()) {
-      if (str.length()>0) {
+      if (!str.isEmpty()) {
         str.append('&');
       }
 
@@ -169,5 +180,29 @@ public class SearchRequest {
     }
 
     return str.toString();
+  }
+
+  public boolean isDateSelected() {
+    return dt >0;
+  }
+
+  public long atEndOfDaySelected() {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(new Date(dt));
+    calendar.set(Calendar.HOUR_OF_DAY, 23);
+    calendar.set(Calendar.MINUTE, 59);
+    calendar.set(Calendar.SECOND, 59);
+    calendar.set(Calendar.MILLISECOND, 999);
+    return calendar.getTime().getTime();
+  }
+
+  public long atStartOfDaySelected() {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(new Date(dt));
+    calendar.set(Calendar.HOUR_OF_DAY, 0);
+    calendar.set(Calendar.MINUTE, 0);
+    calendar.set(Calendar.SECOND, 0);
+    calendar.set(Calendar.MILLISECOND, 0);
+    return calendar.getTime().getTime();
   }
 }

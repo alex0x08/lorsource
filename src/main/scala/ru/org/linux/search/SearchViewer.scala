@@ -63,6 +63,9 @@ class SearchViewer(query: SearchRequest, elastic: ElasticClient) {
       rangeQuery(query.getInterval.getColumn) gt range
     }
 
+    val selectedDateFilter = Option(query) map { query =>
+      rangeQuery(query.getInterval.getColumn) gte query.atStartOfDaySelected() lte query.atEndOfDaySelected()
+    }
     val userFilter = Option(query.getUser) map { user =>
       if (query.isUsertopic) {
         termQuery("topic_author", user.getNick)
@@ -71,7 +74,7 @@ class SearchViewer(query: SearchRequest, elastic: ElasticClient) {
       }
     }
 
-    val queryFilters = (typeFilter ++ dateFilter ++ userFilter).toSeq
+    val queryFilters = (typeFilter ++ (if (query.isDateSelected) selectedDateFilter else dateFilter) ++ userFilter).toSeq
 
     val esQuery = wrapQuery(boost(processQueryString(query.getQ)), queryFilters)
 

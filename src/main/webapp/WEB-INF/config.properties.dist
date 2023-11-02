@@ -47,10 +47,5 @@ comment.scoreValueForEditing=45
 
 Elasticsearch=http://localhost:9200
 
-jdbc.url=jdbc:postgresql://postgres:5432/lor?stringtype=unspecified
-#jdbc.url=jdbc:postgresql://127.0.0.1:5432/real-lor?stringtype=unspecified
-jdbc.user=linuxweb
-jdbc.password=linuxweb
-jdbc.poolSize=10
 
 telegram.token=false
