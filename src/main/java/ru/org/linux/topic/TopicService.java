@@ -208,6 +208,7 @@ public class TopicService {
     }
   }
 
+
   private boolean deleteTopic(int mid, User moderator, String reason, int bonus) {
     boolean deleted = topicDao.delete(mid);
 
@@ -317,6 +318,35 @@ public class TopicService {
 
     return Tuple2.apply(modified, notified);
   }
+
+  @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+  public void solveWithBonus(Topic message, int solutionId, User user, String remark, int bonus) {
+    if (bonus>20 || bonus<0) {
+      throw new IllegalArgumentException("Некорректное значение bonus");
+    }
+
+    if (user.isModerator() && bonus!=0 && user.getId()!=message.getAuthorUserId() && !message.isDraft()) {
+      boolean deleted = solveTopic(message.getId(), solutionId, user, remark, -bonus);
+
+      if (deleted) {
+        userDao.changeScore(message.getAuthorUserId(), -bonus);
+      }
+    } else {
+      solveTopic(message.getId(), solutionId, user, remark, 0);
+    }
+  }
+
+  private boolean solveTopic(int mid, int solutionId, User moderator, String remark, int bonus) {
+    boolean solved = topicDao.solve(mid,solutionId,remark);
+
+    if (solved) {
+      // deleteInfoDao.insert(mid, moderator, reason, bonus);
+      // userEventService.processTopicDeleted(ImmutableList.of(mid));
+    }
+
+    return solved;
+  }
+
 
   private void commit(Topic msg, User commiter, int bonus, Map<Integer, Integer> editorBonus) {
     if (bonus < 0 || bonus > 20) {

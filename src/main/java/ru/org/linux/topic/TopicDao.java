@@ -168,6 +168,10 @@ public class TopicDao {
     return jdbcTemplate.query(queryTopicsIdByTime, (resultSet, i) -> resultSet.getInt("id"), ts_start, ts_end);
   }
 
+  public boolean solve(int msgid,int solutionId,String remark) {
+    return jdbcTemplate.update("UPDATE topics SET solution_id=?, solution_remark_text=? WHERE id=? AND NOT deleted", solutionId, remark, msgid)>0;
+  }
+
   public boolean delete(int msgid) {
     return jdbcTemplate.update("UPDATE topics SET deleted='t',sticky='f' WHERE id=? AND NOT deleted", msgid)>0;
   }

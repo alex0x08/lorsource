@@ -42,7 +42,7 @@ case class Topic(@BeanProperty id: Int, @BeanProperty postscore: Int, @BooleanBe
                  @BooleanBeanProperty notop: Boolean, @BeanProperty userAgentId: Int, @BeanProperty postIP: String,
                  @BooleanBeanProperty resolved: Boolean, @BooleanBeanProperty minor: Boolean,
                  @BooleanBeanProperty draft: Boolean, @BooleanBeanProperty allowAnonymous: Boolean,
-                 reactions: Reactions) {
+                 reactions: Reactions, @Nullable @BeanProperty solutionId: Int, @BeanProperty solutionRemark: String) {
   def getTitleUnescaped: String = StringEscapeUtils.unescapeHtml4(title)
 
   def getPageCount(messages: Int): Int = Math.ceil(commentCount / messages.toDouble).toInt
@@ -108,7 +108,11 @@ object Topic {
       minor = rs.getBoolean("minor"),
       draft = rs.getBoolean("draft"),
       allowAnonymous = rs.getBoolean("allow_anonymous"),
-      reactions = ReactionDao.parse(rs.getString("reactions")))
+      reactions = ReactionDao.parse(rs.getString("reactions")),
+      solutionId = rs.getInt("solution_id"),
+      solutionRemark = StringUtil.makeTitle(rs.getString("solution_remark_text"))
+    )
+
   }
 
   def fromAddRequest(form: AddTopicRequest, user: User, postIP: String): Topic = {
@@ -141,7 +145,7 @@ object Topic {
       minor = false,
       draft = form.isDraftMode,
       allowAnonymous = form.isAllowAnonymous,
-      reactions = Reactions.empty)
+      reactions = Reactions.empty, solutionId = 0, solutionRemark = null)
   }
 
   def fromEditRequest(group: Group, original: Topic, form: EditTopicRequest, publish: Boolean): Topic = {
@@ -179,6 +183,6 @@ object Topic {
       draft = if (publish) false else original.draft,
       minor = minor,
       allowAnonymous = original.allowAnonymous,
-      reactions = original.reactions)
+      reactions = original.reactions, solutionId = 0, solutionRemark = null)
   }
 }
