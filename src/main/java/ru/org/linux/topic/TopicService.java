@@ -336,8 +336,8 @@ public class TopicService {
     }
   }
 
-  private boolean solveTopic(int mid, int solutionId, User moderator, String remark, int bonus) {
-    boolean solved = topicDao.solve(mid,solutionId,remark);
+  private boolean solveTopic(int topicId, int solutionId, User moderator, String remark, int bonus) {
+    boolean solved = topicDao.solve(topicId,solutionId,remark);
 
     if (solved) {
       // deleteInfoDao.insert(mid, moderator, reason, bonus);

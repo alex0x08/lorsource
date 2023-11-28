@@ -94,7 +94,7 @@ public class TopicDao {
         "urlname, section, topics.sticky, topics.postip, " +
         "COALESCE(commitdate, postdate)<(CURRENT_TIMESTAMP-sections.expire) as expired, deleted, lastmod, commitby, " +
         "commitdate, topics.stat1, postscore, topics.moderate, notop, " +
-        "topics.resolved, minor, draft, allow_anonymous, topics.reactions " +
+        "topics.resolved, minor, draft, allow_anonymous, topics.reactions, topics.solution_id, topics.solution_remark_text " +
         "FROM topics " +
         "INNER JOIN groups ON (groups.id=topics.groupid) " +
         "INNER JOIN sections ON (sections.id=groups.section) " +
@@ -168,8 +168,8 @@ public class TopicDao {
     return jdbcTemplate.query(queryTopicsIdByTime, (resultSet, i) -> resultSet.getInt("id"), ts_start, ts_end);
   }
 
-  public boolean solve(int msgid,int solutionId,String remark) {
-    return jdbcTemplate.update("UPDATE topics SET solution_id=?, solution_remark_text=? WHERE id=? AND NOT deleted", solutionId, remark, msgid)>0;
+  public boolean solve(int topicId,int solutionId,String remark) {
+    return jdbcTemplate.update("UPDATE topics SET solution_id=?, solution_remark_text=? WHERE id=? AND NOT deleted", solutionId, remark, topicId)>0;
   }
 
   public boolean delete(int msgid) {
